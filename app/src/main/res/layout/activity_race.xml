@@ -1,68 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/rootRace"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
+             android:id="@+id/rootRace"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
     <!-- Background 2 image để seamless scrolling -->
-    <ImageView
-        android:id="@+id/bgImage1"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:src="@drawable/bg_track" />
-
-    <ImageView
-        android:id="@+id/bgImage2"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="fitXY"
-        android:src="@drawable/bg_track" />
-
+    <ImageView android:id="@+id/bgImage1"
+               android:layout_width="wrap_content"
+               android:layout_height="match_parent"
+               android:scaleType="centerCrop"
+               android:adjustViewBounds="true"
+               android:src="@drawable/bg_track" />
+    <ImageView android:id="@+id/bgImage2"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:adjustViewBounds="true"
+               android:scaleType="centerCrop"
+               android:src="@drawable/bg_track" />
     <!-- Vạch đích -->
-    <View
-        android:id="@+id/finishLine"
-        android:layout_width="6dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:background="@android:color/white"
-        android:visibility="gone" />
-
+    <View android:id="@+id/finishLine"
+          android:layout_width="6dp"
+          android:layout_height="match_parent"
+          android:layout_gravity="end"
+          android:background="@android:color/white"
+          android:visibility="gone" />
     <!-- Lanes chứa SeekBar + ImageView ngựa -->
-    <LinearLayout
-        android:id="@+id/laneContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="8dp"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="32dp">
-
-        <FrameLayout
-            android:id="@+id/lane1"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginBottom="4dp"/>
-
-        <FrameLayout
-            android:id="@+id/lane2"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:layout_marginBottom="4dp"/>
-
-        <FrameLayout
-            android:id="@+id/lane3"
-            android:layout_width="match_parent"
-            android:layout_height="80dp"/>
+    <LinearLayout android:id="@+id/laneContainer"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:orientation="vertical"
+                  android:padding="8dp"
+                  android:layout_gravity="bottom"
+                  android:layout_marginBottom="32dp">
+        <FrameLayout android:id="@+id/lane1"
+                     android:layout_width="match_parent"
+                     android:layout_height="80dp"
+                     android:layout_marginBottom="4dp" />
+        <FrameLayout android:id="@+id/lane2"
+                     android:layout_width="match_parent"
+                     android:layout_height="80dp"
+                     android:layout_marginBottom="4dp" />
+        <FrameLayout android:id="@+id/lane3"
+                     android:layout_width="match_parent"
+                     android:layout_height="80dp" />
+        <FrameLayout android:id="@+id/lane4"
+                     android:layout_width="match_parent"
+                     android:layout_height="80dp"
+                     android:layout_marginBottom="4dp" />
     </LinearLayout>
-
     <!-- Start button -->
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start Race"
-        android:layout_gravity="center|bottom"
-        android:layout_marginBottom="24dp"
-        android:backgroundTint="@color/design_default_color_secondary_variant"
-        android:textColor="@android:color/white"/>
+    <Button android:id="@+id/btnStart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:layout_marginBottom="6dp"
+            android:backgroundTint="@color/design_default_color_secondary_variant"
+            android:text="Start Race"
+            android:textColor="@android:color/white" />
+    <Button android:id="@+id/btnNewRace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Race"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="16dp" />
 </FrameLayout>
