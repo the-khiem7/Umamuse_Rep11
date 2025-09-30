@@ -11,8 +11,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Umamuse">
+
         <activity
-            android:name=".MainActivity"
+            android:name=".MainActivity"/>
+
+        <activity
+            android:name=".RaceActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
