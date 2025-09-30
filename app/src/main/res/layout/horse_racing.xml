@@ -26,7 +26,17 @@
         android:textSize="22sp"
         android:textStyle="bold" />
 
-    <!-- Track 1 -->
+    <EditText
+        android:id="@+id/edtMoney"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/rounded_edittext"
+        android:hint="Nhập số tiền cược"
+        android:inputType="number"
+        android:padding="12dp"
+        android:textSize="16sp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -47,17 +57,8 @@
             android:layout_weight="1"
             android:progressDrawable="@drawable/seekbar_track"
             android:thumb="@drawable/baseline_favorite_24" />
-
-        <EditText
-            android:id="@+id/edtBet1"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:hint="Bet"
-            android:inputType="number"
-            android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- Track 2 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -78,17 +79,8 @@
             android:layout_weight="1"
             android:progressDrawable="@drawable/seekbar_track"
             android:thumb="@drawable/baseline_favorite_24" />
-
-        <EditText
-            android:id="@+id/edtBet2"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:hint="Bet"
-            android:inputType="number"
-            android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- Track 3 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -109,17 +101,8 @@
             android:layout_weight="1"
             android:progressDrawable="@drawable/seekbar_track"
             android:thumb="@drawable/baseline_favorite_24" />
-
-        <EditText
-            android:id="@+id/edtBet3"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:hint="Bet"
-            android:inputType="number"
-            android:textSize="14sp" />
     </LinearLayout>
 
-    <!-- Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
