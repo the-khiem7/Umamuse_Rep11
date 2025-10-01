@@ -4,11 +4,13 @@ public class HorseBet {
     private Horse horse;
     private float odds;
     private int betAmount;
+    private int newBetAmount; // Additional field to track new bets separately
 
     public HorseBet(Horse horse, float odds) {
         this.horse = horse;
         this.odds = odds;
         this.betAmount = 0;
+        this.newBetAmount = 0;
     }
 
     public Horse getHorse() {
@@ -31,7 +33,19 @@ public class HorseBet {
         this.betAmount = betAmount;
     }
     
+    public int getNewBetAmount() {
+        return newBetAmount;
+    }
+    
+    public void setNewBetAmount(int newBetAmount) {
+        this.newBetAmount = newBetAmount;
+    }
+    
+    public int getTotalBetAmount() {
+        return betAmount + newBetAmount;
+    }
+    
     public float calculatePotentialWinnings() {
-        return betAmount * odds;
+        return getTotalBetAmount() * odds;
     }
 }

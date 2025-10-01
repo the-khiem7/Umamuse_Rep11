@@ -48,11 +48,17 @@ public class HorseBetAdapter extends RecyclerView.Adapter<HorseBetAdapter.HorseB
             holder.etBetAmount.removeTextChangedListener(holder.textWatcher);
         }
         
-        // Set the current bet amount if any
+        // Display the existing bet if any
         if (horseBet.getBetAmount() > 0) {
-            holder.etBetAmount.setText(String.valueOf(horseBet.getBetAmount()));
-        } else {
+            holder.tvExistingBet.setVisibility(View.VISIBLE);
+            holder.tvExistingBet.setText("Current bet: $" + horseBet.getBetAmount());
+            // Clear the EditText as it now represents a new bet
             holder.etBetAmount.setText("");
+            holder.etBetAmount.setHint("Add more");
+        } else {
+            holder.tvExistingBet.setVisibility(View.GONE);
+            holder.etBetAmount.setText("");
+            holder.etBetAmount.setHint("Enter bet amount");
         }
         
         // Create new TextWatcher for this position
@@ -68,18 +74,45 @@ public class HorseBetAdapter extends RecyclerView.Adapter<HorseBetAdapter.HorseB
                 try {
                     if (!s.toString().isEmpty()) {
                         int amount = Integer.parseInt(s.toString());
-                        horseBet.setBetAmount(amount);
+                        horseBet.setNewBetAmount(amount);
+                        
+                        // Update potential winnings display
+                        if (amount > 0 || horseBet.getBetAmount() > 0) {
+                            holder.tvPotentialWinnings.setVisibility(View.VISIBLE);
+                            holder.tvPotentialWinnings.setText("Potential win: $" + 
+                                Math.round(horseBet.calculatePotentialWinnings() * 100) / 100.0f);
+                        } else {
+                            holder.tvPotentialWinnings.setVisibility(View.GONE);
+                        }
                     } else {
-                        horseBet.setBetAmount(0);
+                        horseBet.setNewBetAmount(0);
+                        
+                        // Still show potential winnings if there's an existing bet
+                        if (horseBet.getBetAmount() > 0) {
+                            holder.tvPotentialWinnings.setVisibility(View.VISIBLE);
+                            holder.tvPotentialWinnings.setText("Potential win: $" + 
+                                Math.round(horseBet.calculatePotentialWinnings() * 100) / 100.0f);
+                        } else {
+                            holder.tvPotentialWinnings.setVisibility(View.GONE);
+                        }
                     }
                 } catch (NumberFormatException e) {
-                    horseBet.setBetAmount(0);
+                    horseBet.setNewBetAmount(0);
                 }
             }
         };
         
         // Add the new TextWatcher
         holder.etBetAmount.addTextChangedListener(holder.textWatcher);
+        
+        // Initialize potential winnings display
+        if (horseBet.getBetAmount() > 0) {
+            holder.tvPotentialWinnings.setVisibility(View.VISIBLE);
+            holder.tvPotentialWinnings.setText("Potential win: $" + 
+                Math.round(horseBet.calculatePotentialWinnings() * 100) / 100.0f);
+        } else {
+            holder.tvPotentialWinnings.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -91,6 +124,8 @@ public class HorseBetAdapter extends RecyclerView.Adapter<HorseBetAdapter.HorseB
         ImageView ivHorse;
         TextView tvHorseName;
         TextView tvOdds;
+        TextView tvExistingBet;
+        TextView tvPotentialWinnings;
         EditText etBetAmount;
         TextWatcher textWatcher; // Store reference to remove it later
 
@@ -99,6 +134,8 @@ public class HorseBetAdapter extends RecyclerView.Adapter<HorseBetAdapter.HorseB
             ivHorse = itemView.findViewById(R.id.ivHorse);
             tvHorseName = itemView.findViewById(R.id.tvHorseName);
             tvOdds = itemView.findViewById(R.id.tvOdds);
+            tvExistingBet = itemView.findViewById(R.id.tvExistingBet);
+            tvPotentialWinnings = itemView.findViewById(R.id.tvPotentialWinnings);
             etBetAmount = itemView.findViewById(R.id.etBetAmount);
         }
     }

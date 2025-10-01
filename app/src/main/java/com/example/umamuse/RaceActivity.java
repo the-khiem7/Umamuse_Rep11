@@ -117,19 +117,41 @@ public class RaceActivity extends AppCompatActivity {
                     // Get bets data from BetActivity
                     Bundle extras = result.getData().getExtras();
                     if (extras != null) {
-                        userBets.clear();
+                        // Process new bets and accumulate them with existing ones
                         for (Horse horse : raceHorses) {
                             int horseId = horse.getId();
                             if (extras.containsKey("bet_amount_" + horseId) && extras.containsKey("bet_odds_" + horseId)) {
-                                int betAmount = extras.getInt("bet_amount_" + horseId);
+                                int newBetAmount = extras.getInt("bet_amount_" + horseId);
                                 float odds = extras.getFloat("bet_odds_" + horseId);
-                                if (betAmount > 0) {
-                                    userBets.put(horseId, new HorseBet(horse, odds));
-                                    userBets.get(horseId).setBetAmount(betAmount);
+                                
+                                if (newBetAmount > 0) {
+                                    // If we already have a bet for this horse, add to it
+                                    if (userBets.containsKey(horseId)) {
+                                        HorseBet existingBet = userBets.get(horseId);
+                                        // Keep the average of the odds weighted by bet amounts
+                                        int existingAmount = existingBet.getBetAmount();
+                                        float existingOdds = existingBet.getOdds();
+                                        
+                                        int totalAmount = existingAmount + newBetAmount;
+                                        // Calculate weighted average odds
+                                        float weightedOdds = (existingOdds * existingAmount + odds * newBetAmount) / totalAmount;
+                                        // Round to 1 decimal place
+                                        weightedOdds = Math.round(weightedOdds * 10) / 10.0f;
+                                        
+                                        existingBet.setBetAmount(totalAmount);
+                                        existingBet.setOdds(weightedOdds);
+                                    } else {
+                                        // Create a new bet for this horse
+                                        userBets.put(horseId, new HorseBet(horse, odds));
+                                        userBets.get(horseId).setBetAmount(newBetAmount);
+                                    }
                                 }
                             }
                         }
                         updateUserBalanceDisplay();
+                        
+                        // Show summary of accumulated bets
+                        showAccumulatedBetsSummary();
                     }
                 }
             }
@@ -143,6 +165,27 @@ public class RaceActivity extends AppCompatActivity {
         }
     }
     
+    private void showAccumulatedBetsSummary() {
+        if (userBets.isEmpty()) {
+            return;
+        }
+        
+        int totalBetAmount = 0;
+        StringBuilder summary = new StringBuilder("Current bets:\n");
+        
+        for (HorseBet bet : userBets.values()) {
+            if (bet.getBetAmount() > 0) {
+                totalBetAmount += bet.getBetAmount();
+                summary.append(bet.getHorse().getName())
+                       .append(": $").append(bet.getBetAmount())
+                       .append(" (Odds: ").append(bet.getOdds()).append(")\n");
+            }
+        }
+        
+        summary.append("\nTotal bet amount: $").append(totalBetAmount);
+        Toast.makeText(this, summary.toString(), Toast.LENGTH_LONG).show();
+    }
+    
     private void openBetActivity() {
         // Make sure we have horses prepared before opening the bet activity
         if (raceHorses == null || raceHorses.isEmpty()) {
@@ -154,6 +197,24 @@ public class RaceActivity extends AppCompatActivity {
         HorseRepository.setCurrentRaceHorses(raceHorses);
         
         Intent intent = new Intent(this, BetActivity.class);
+        
+        // Pass current bet information to BetActivity
+        boolean hasExistingBets = !userBets.isEmpty();
+        
+        if (hasExistingBets) {
+            intent.putExtra("has_existing_bets", true);
+            
+            for (Map.Entry<Integer, HorseBet> entry : userBets.entrySet()) {
+                int horseId = entry.getKey();
+                HorseBet bet = entry.getValue();
+                
+                intent.putExtra("existing_bet_amount_" + horseId, bet.getBetAmount());
+                intent.putExtra("existing_bet_odds_" + horseId, bet.getOdds());
+            }
+        } else {
+            intent.putExtra("has_existing_bets", false);
+        }
+        
         betActivityLauncher.launch(intent);
     }
 
@@ -163,6 +224,9 @@ public class RaceActivity extends AppCompatActivity {
         Collections.shuffle(allHorses);
         raceHorses = new ArrayList<>(allHorses.subList(0, 4));
         HorseRepository.setCurrentRaceHorses(raceHorses);
+
+        // Reset bets for new race
+        userBets.clear();
 
         horseImages.clear();
         horseSeekBars.clear();
@@ -193,6 +257,9 @@ public class RaceActivity extends AppCompatActivity {
         btnStart.setEnabled(true);
         btnPlaceBet.setEnabled(true);
         btnPrepare.setEnabled(false);
+        
+        // Show that all bets have been cleared for the new race
+        Toast.makeText(this, "New race prepared. Place your bets!", Toast.LENGTH_SHORT).show();
     }
 
     private void startRace() {

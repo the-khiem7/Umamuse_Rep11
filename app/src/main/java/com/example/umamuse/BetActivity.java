@@ -71,13 +71,35 @@ public class BetActivity extends AppCompatActivity {
             return;
         }
         
-        // Generate random odds for each horse
+        // Check if we have existing bets from intent extras
+        boolean hasExistingBets = getIntent().getBooleanExtra("has_existing_bets", false);
+        
+        // Generate odds for each horse
         for (Horse horse : raceHorses) {
-            // Odds between 1.5 and 5.0
-            float odds = 1.5f + random.nextFloat() * 3.5f;
-            // Round to 1 decimal place
-            odds = Math.round(odds * 10) / 10.0f;
-            horseBets.add(new HorseBet(horse, odds));
+            int horseId = horse.getId();
+            float odds;
+            
+            // If we have existing bets for this horse, use the same odds
+            if (hasExistingBets && getIntent().hasExtra("existing_bet_odds_" + horseId)) {
+                odds = getIntent().getFloatExtra("existing_bet_odds_" + horseId, 0f);
+            } else {
+                // Generate new random odds between 1.5 and 5.0
+                odds = 1.5f + random.nextFloat() * 3.5f;
+                // Round to 1 decimal place
+                odds = Math.round(odds * 10) / 10.0f;
+            }
+            
+            HorseBet horseBet = new HorseBet(horse, odds);
+            
+            // If we have existing bets for this horse, set the previous bet amount
+            if (hasExistingBets && getIntent().hasExtra("existing_bet_amount_" + horseId)) {
+                int existingBetAmount = getIntent().getIntExtra("existing_bet_amount_" + horseId, 0);
+                horseBet.setBetAmount(existingBetAmount);
+                // Initialize newBetAmount as 0, user will add new bets
+                horseBet.setNewBetAmount(0);
+            }
+            
+            horseBets.add(horseBet);
         }
     }
 
@@ -102,54 +124,64 @@ public class BetActivity extends AppCompatActivity {
     }
 
     private void confirmBets() {
-        boolean hasBets = false;
-        int totalBetAmount = 0;
-        StringBuilder betSummary = new StringBuilder("Your bets:\n");
+        boolean hasNewBets = false;
+        int totalNewBetAmount = 0;
+        StringBuilder betSummary = new StringBuilder("New bets:\n");
         
-        // Calculate total bet amount and create summary
+        // Calculate total new bet amount and create summary
         for (HorseBet bet : horseBets) {
-            if (bet.getBetAmount() > 0) {
-                hasBets = true;
-                int amount = bet.getBetAmount();
-                totalBetAmount += amount;
+            if (bet.getNewBetAmount() > 0) {
+                hasNewBets = true;
+                int amount = bet.getNewBetAmount();
+                totalNewBetAmount += amount;
                 
                 betSummary.append(bet.getHorse().getName())
-                          .append(": $").append(amount)
+                          .append(": +$").append(amount)
                           .append(" (Odds: ").append(bet.getOdds()).append(")\n");
-            }
-        }
-        
-        // Check if user has enough balance
-        int userBalance = UserPreferences.getUserBalance(this);
-        
-        if (hasBets) {
-            if (totalBetAmount > userBalance) {
-                Toast.makeText(this, "Not enough balance to place these bets", Toast.LENGTH_LONG).show();
-                return;
-            }
-            
-            // Deduct bet amount from balance (actual winnings will be calculated after race)
-            UserPreferences.subtractFromUserBalance(this, totalBetAmount);
-            
-            // Create intent to return data to RaceActivity
-            Intent resultIntent = new Intent();
-            
-            // Add bet information to intent
-            for (HorseBet bet : horseBets) {
+                
                 if (bet.getBetAmount() > 0) {
-                    Horse horse = bet.getHorse();
-                    resultIntent.putExtra("bet_amount_" + horse.getId(), bet.getBetAmount());
-                    resultIntent.putExtra("bet_odds_" + horse.getId(), bet.getOdds());
+                    // Include previous bet amount in summary
+                    betSummary.append("  Previous bet: $").append(bet.getBetAmount())
+                              .append(", Total: $").append(bet.getTotalBetAmount()).append("\n");
                 }
             }
-            
-            // Set result and finish
-            setResult(RESULT_OK, resultIntent);
-            Toast.makeText(this, betSummary.toString(), Toast.LENGTH_LONG).show();
-            finish();
-        } else {
-            Toast.makeText(this, "Please place at least one bet", Toast.LENGTH_SHORT).show();
         }
+        
+        // Check if user has placed any new bets
+        if (!hasNewBets) {
+            Toast.makeText(this, "Please place at least one new bet", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Check if user has enough balance for new bets
+        int userBalance = UserPreferences.getUserBalance(this);
+        
+        if (totalNewBetAmount > userBalance) {
+            Toast.makeText(this, "Not enough balance to place these bets", Toast.LENGTH_LONG).show();
+            return;
+        }
+        
+        // Deduct new bet amount from balance (actual winnings will be calculated after race)
+        UserPreferences.subtractFromUserBalance(this, totalNewBetAmount);
+        
+        // Create intent to return data to RaceActivity
+        Intent resultIntent = new Intent();
+        
+        // Add bet information to intent
+        for (HorseBet bet : horseBets) {
+            Horse horse = bet.getHorse();
+            // Only send new bet data, RaceActivity will handle accumulation
+            if (bet.getNewBetAmount() > 0) {
+                resultIntent.putExtra("bet_amount_" + horse.getId(), bet.getNewBetAmount());
+                resultIntent.putExtra("bet_odds_" + horse.getId(), bet.getOdds());
+            }
+        }
+        
+        // Set result and finish
+        setResult(RESULT_OK, resultIntent);
+        betSummary.append("\nTotal new bets: $").append(totalNewBetAmount);
+        Toast.makeText(this, betSummary.toString(), Toast.LENGTH_LONG).show();
+        finish();
     }
 
     @Override

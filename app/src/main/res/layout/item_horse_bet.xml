@@ -35,6 +35,15 @@
                       android:textSize="20sp"
                       android:layout_marginTop="8dp"
                       tools:text="Odds: 2.5" />
+            <TextView android:id="@+id/tvExistingBet"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:gravity="center"
+                      android:textSize="18sp"
+                      android:textColor="#4CAF50"
+                      android:layout_marginTop="8dp"
+                      android:visibility="gone"
+                      tools:text="Current bet: $100" />
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
                           android:orientation="horizontal"
@@ -56,6 +65,16 @@
                           android:padding="12dp"
                           android:background="@android:drawable/edit_text" />
             </LinearLayout>
+            <TextView android:id="@+id/tvPotentialWinnings"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:gravity="center"
+                      android:textSize="16sp"
+                      android:textColor="#2196F3"
+                      android:textStyle="italic"
+                      android:layout_marginTop="8dp"
+                      android:visibility="gone"
+                      tools:text="Potential win: $250" />
         </LinearLayout>
     </ScrollView>
 </androidx.cardview.widget.CardView>
