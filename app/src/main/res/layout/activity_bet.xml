@@ -1,41 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             android:padding="16dp"
-             android:background="#E8F5E9">
-    <LinearLayout android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_gravity="top|left"
-                  android:layout_margin="16dp"
-                  android:orientation="horizontal">
-        <Button android:id="@+id/btnBackToRace"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Back to Race"
-                android:textColor="@android:color/white"
-                android:backgroundTint="#2196F3"
-                android:layout_marginRight="8dp"
-                android:padding="8dp" />
-        <TextView android:id="@+id/tvUserBalance"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:background="#80000000"
-                  android:padding="8dp"
-                  android:text="Balance: $1000"
-                  android:textColor="@android:color/white"
-                  android:textSize="16sp"
-                  android:textStyle="bold" />
-    </LinearLayout>
-    <androidx.viewpager2.widget.ViewPager2 android:id="@+id/vpHorses"
-                                           android:layout_width="match_parent"
-                                           android:layout_height="wrap_content"
-                                           android:layout_gravity="center" />
-    <Button android:id="@+id/btnConfirmBet"
-            android:layout_width="match_parent"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#E8F5E9">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|left"
+        android:layout_margin="16dp"
+        android:orientation="horizontal">
+        <!-- Nhóm các nút âm thanh -->
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Confirm Bets"
-            android:layout_gravity="center_horizontal|bottom"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="#4CAF50" />
+            android:orientation="horizontal"
+            android:layout_marginRight="8dp">
+            <!-- Nút bài hát trước đó -->
+            <Button
+                android:id="@+id/btnPreviousTrack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_previous_track_selector"
+                android:layout_marginRight="4dp" />
+            <!-- Sound toggle button -->
+            <ToggleButton
+                android:id="@+id/btnToggleSound"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/btn_sound_selector"
+                android:textOff=""
+                android:textOn="" />
+            <!-- Nút bài hát tiếp theo -->
+            <Button
+                android:id="@+id/btnNextTrack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/btn_next_track_selector"
+                android:layout_marginLeft="4dp" />
+        </LinearLayout>
+        <Button
+            android:id="@+id/btnBackToRace"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back to Race"
+            android:textColor="@android:color/white"
+            android:backgroundTint="#2196F3"
+            android:layout_marginRight="8dp"
+            android:padding="8dp" />
+        <TextView
+            android:id="@+id/tvUserBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#80000000"
+            android:padding="8dp"
+            android:text="Balance: $1000"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/vpHorses"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+    <Button
+        android:id="@+id/btnConfirmBet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirm Bets"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#4CAF50" />
 </FrameLayout>

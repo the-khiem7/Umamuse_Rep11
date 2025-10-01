@@ -1,15 +1,15 @@
 package com.example.umamuse;
 
-
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AlertDialog;
@@ -18,13 +18,27 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class DepositMoneyActivity extends AppCompatActivity {
-    Button btnTrolai, btnClickMua;
-    RadioGroup radioBtn_group;
-    RadioButton radBtn1, radBtn2, radBtn3;
+import com.example.umamuse.utils.MusicManager;
+import com.example.umamuse.utils.UserPreferences;
 
-    int selectedValue = 0;
-    String selectedText = "";
+public class DepositMoneyActivity extends AppCompatActivity {
+    private Button btnTrolai, btnClickMua;
+    private RadioGroup radioBtn_group;
+    private RadioButton radBtn1, radBtn2, radBtn3;
+    private TextView tvCurrentBalance;
+    private ToggleButton btnToggleSound;
+    private Button btnPreviousTrack, btnNextTrack;
+    
+    // Music manager
+    private MusicManager musicManager;
+
+    private int selectedValue = 0;
+    private String selectedText = "";
+    
+    // Define the package amounts
+    private static final int PACK_1_AMOUNT = 100;
+    private static final int PACK_2_AMOUNT = 550;
+    private static final int PACK_3_AMOUNT = 1200;
 
 
     @Override
@@ -39,6 +53,20 @@ public class DepositMoneyActivity extends AppCompatActivity {
         radBtn1 = findViewById(R.id.radBtn1);
         radBtn2 = findViewById(R.id.radBtn2);
         radBtn3 = findViewById(R.id.radBtn3);
+        tvCurrentBalance = findViewById(R.id.tvCurrentBalance);
+        btnToggleSound = findViewById(R.id.btnToggleSound);
+        btnPreviousTrack = findViewById(R.id.btnPreviousTrack);
+        btnNextTrack = findViewById(R.id.btnNextTrack);
+        
+        // Display current balance
+        updateBalanceDisplay();
+        
+        // Initialize music manager
+        musicManager = new MusicManager(this, btnToggleSound);
+        musicManager.bindMusicService();
+        
+        // Set up music controls
+        setupMusicControls();
 
         btnClickMua.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,14 +79,14 @@ public class DepositMoneyActivity extends AppCompatActivity {
                 }
 
                 if (idSelect == R.id.radBtn1) {
-                    selectedValue = 100;
-                    selectedText = "Starter Pack – 100 xu";
+                    selectedValue = PACK_1_AMOUNT;
+                    selectedText = "Return Pack – $" + PACK_1_AMOUNT;
                 } else if (idSelect == R.id.radBtn2) {
-                    selectedValue = 550;
-                    selectedText = "Pro Pack – 550 xu";
+                    selectedValue = PACK_2_AMOUNT;
+                    selectedText = "Comeback Pack – $" + PACK_2_AMOUNT;
                 } else if (idSelect == R.id.radBtn3) {
-                    selectedValue = 1000;
-                    selectedText = "Elite Pack – 1000 xu";
+                    selectedValue = PACK_3_AMOUNT;
+                    selectedText = "God of Bet Pack – $" + PACK_3_AMOUNT;
                 }
 
                 // Hiển thị hộp thoại xác nhận
@@ -69,29 +97,33 @@ public class DepositMoneyActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                Intent myItent = new Intent(DepositMoneyActivity.this, MainActivity.class);
+                                // Add money to user's balance using UserPreferences
+                                UserPreferences.addToUserBalance(DepositMoneyActivity.this, selectedValue);
+                                
+                                // Update balance display
+                                updateBalanceDisplay();
+                                
+                                // Show success animation on button
+                                btnClickMua.animate()
+                                    .scaleX(0.9f)
+                                    .scaleY(0.9f)
+                                    .setDuration(100)
+                                    .withEndAction(() -> {
+                                        btnClickMua.animate()
+                                            .scaleX(1f)
+                                            .scaleY(1f)
+                                            .setDuration(100);
+                                    });
 
-                                // Lưu SharedPreferences khi người dùng chọn Đồng ý
-                                SharedPreferences mySharedPreferences = getSharedPreferences("Money", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = mySharedPreferences.edit();
-
-                                int oldBalance = mySharedPreferences.getInt("balance", 0); // số dư cũ
-
-//                                if (oldBalance < selectedValue) {
-//                                    Toast.makeText(Deposit_Money.this, "Số dư không đủ", Toast.LENGTH_LONG).show();
-//                                    return;
-//                                }
-
-                                int newBalance = oldBalance + selectedValue;
-
-                                editor.putInt("balance", newBalance); // lưu lại số dư
-//                                editor.remove("balance"); // xóa dữ liệu cũ"
-
-                                editor.commit();
-
-                                Toast.makeText(DepositMoneyActivity.this, "Mua gói thành công: " + selectedText, Toast.LENGTH_LONG).show();
-                                myItent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK); // xóa lịch sử activity trước đó
-                                startActivity(myItent);
+                                // Show success message
+                                Toast.makeText(DepositMoneyActivity.this, 
+                                    "Nạp tiền thành công: " + selectedText, 
+                                    Toast.LENGTH_LONG).show();
+                                
+                                // Return to RaceActivity
+                                Intent raceIntent = new Intent(DepositMoneyActivity.this, RaceActivity.class);
+                                raceIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(raceIntent);
                                 finish();
                             }
                         })
@@ -109,8 +141,19 @@ public class DepositMoneyActivity extends AppCompatActivity {
         btnTrolai.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                finish(); // chỉ đơn giản quay lại màn hình trước
+                // Show confirmation dialog when back button is pressed
+                new AlertDialog.Builder(DepositMoneyActivity.this)
+                    .setTitle(R.string.exit_confirmation_title)
+                    .setMessage(R.string.exit_confirmation_message)
+                    .setPositiveButton(R.string.yes, (dialog, which) -> {
+                        // If user confirms, navigate back
+                        finish();
+                    })
+                    .setNegativeButton(R.string.no, (dialog, which) -> {
+                        // If user cancels, do nothing
+                        dialog.dismiss();
+                    })
+                    .show();
             }
         });
 
@@ -124,13 +167,58 @@ public class DepositMoneyActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        SharedPreferences mySharedPreferences = getSharedPreferences("Money", MODE_PRIVATE);
-        SharedPreferences.Editor editor = mySharedPreferences.edit();
-        editor.putInt("selected_package", selectedValue); // lưu giá trị đã chọn
-        editor.commit();
+    protected void onResume() {
+        super.onResume();
+        updateBalanceDisplay();
     }
-
+    
+    @Override
+    protected void onDestroy() {
+        // Unbind from the music service when the activity is destroyed
+        if (musicManager != null) {
+            musicManager.unbindMusicService();
+        }
+        super.onDestroy();
+    }
+    
+    /**
+     * Set up music control buttons
+     */
+    private void setupMusicControls() {
+        // Previous track button
+        btnPreviousTrack.setOnClickListener(v -> {
+            musicManager.previousTrack();
+            showTrackChangeToast();
+        });
+        
+        // Next track button
+        btnNextTrack.setOnClickListener(v -> {
+            musicManager.nextTrack();
+            showTrackChangeToast();
+        });
+    }
+    
+    /**
+     * Hiển thị thông báo khi thay đổi bài hát
+     */
+    private void showTrackChangeToast() {
+        String currentTrack = musicManager.getCurrentTrackName();
+        if (currentTrack != null) {
+            Toast.makeText(
+                this, 
+                getString(R.string.track_changed, currentTrack), 
+                Toast.LENGTH_SHORT
+            ).show();
+        }
+    }
+    
+    /**
+     * Updates the balance display TextView with the current user balance
+     */
+    private void updateBalanceDisplay() {
+        if (tvCurrentBalance != null) {
+            int currentBalance = UserPreferences.getUserBalance(this);
+            tvCurrentBalance.setText("Your current balance: $" + currentBalance);
+        }
+    }
 }

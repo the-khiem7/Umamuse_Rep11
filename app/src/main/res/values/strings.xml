@@ -1,3 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="app_name">Umamuse</string>
+    <string
+        name="app_name">Umamuse</string>
+    <string
+        name="now_playing">Đang phát: %s</string>
+    <string
+        name="previous_track">Bài hát trước</string>
+    <string
+        name="next_track">Bài hát tiếp theo</string>
+    <string
+        name="track_changed">Đổi sang: %s</string>
+    <string
+        name="exit_confirmation_title">Thoát</string>
+    <string
+        name="exit_confirmation_message">Bạn có muốn thoát không?</string>
+    <string
+        name="yes">Có</string>
+    <string
+        name="no">Không</string>
 </resources>

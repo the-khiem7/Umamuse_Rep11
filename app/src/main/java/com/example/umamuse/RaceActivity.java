@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -24,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.umamuse.models.Horse;
 import com.example.umamuse.models.HorseBet;
 import com.example.umamuse.repositories.HorseRepository;
+import com.example.umamuse.utils.MusicManager;
 import com.example.umamuse.utils.UserPreferences;
 
 import java.util.ArrayList;
@@ -37,8 +39,16 @@ public class RaceActivity extends AppCompatActivity {
 
     private ImageView bgImage1, bgImage2;
     private View finishLine;
-    private Button btnPrepare, btnStart, btnPlaceBet;
+    private Button btnRaceAction, btnPlaceBet, btnDeposit;
     private FrameLayout lane1, lane2, lane3, lane4;
+    private ToggleButton btnToggleSound;
+    private Button btnPreviousTrack, btnNextTrack;
+    
+    // Flag to track if race is prepared and ready to start
+    private boolean isRacePrepared = false;
+    
+    // Music manager
+    private MusicManager musicManager;
 
     private List<Horse> raceHorses;
     private List<ImageView> horseImages;
@@ -72,10 +82,13 @@ public class RaceActivity extends AppCompatActivity {
         bgImage1 = findViewById(R.id.bgImage1);
         bgImage2 = findViewById(R.id.bgImage2);
         finishLine = findViewById(R.id.finishLine);
-        btnPrepare = findViewById(R.id.btnNewRace);
-        btnStart = findViewById(R.id.btnStart);
+        btnRaceAction = findViewById(R.id.btnRaceAction);
         btnPlaceBet = findViewById(R.id.btnPlaceBet);
+        btnDeposit = findViewById(R.id.btnDeposit);
         tvUserBalance = findViewById(R.id.tvUserBalance);
+        btnToggleSound = findViewById(R.id.btnToggleSound);
+        btnPreviousTrack = findViewById(R.id.btnPreviousTrack);
+        btnNextTrack = findViewById(R.id.btnNextTrack);
 
         lane1 = findViewById(R.id.lane1);
         lane2 = findViewById(R.id.lane2);
@@ -85,19 +98,34 @@ public class RaceActivity extends AppCompatActivity {
         horseImages = new ArrayList<>();
         horseSeekBars = new ArrayList<>();
 
-        btnPrepare.setText("Prepare Race");
-        btnStart.setText("Start Race");
-        btnStart.setEnabled(false);
+        btnRaceAction.setText("Prepare Race");
 
-        btnPrepare.setOnClickListener(v -> prepareRace());
-        btnStart.setOnClickListener(v -> startRace());
+        // Set up combined action button click listener
+        btnRaceAction.setOnClickListener(v -> {
+            if (!isRacePrepared) {
+                // If race is not prepared, prepare it
+                prepareRace();
+            } else {
+                // If race is prepared, start it
+                startRace();
+            }
+        });
+        
         btnPlaceBet.setOnClickListener(v -> openBetActivity());
+        btnDeposit.setOnClickListener(v -> openDepositActivity());
         
         // Initially disable the bet button until horses are prepared
         btnPlaceBet.setEnabled(false);
         
         // Set up activity result launcher for BetActivity
         setupBetActivityLauncher();
+        
+        // Initialize music manager
+        musicManager = new MusicManager(this, btnToggleSound);
+        musicManager.bindMusicService();
+        
+        // Set up music control buttons
+        setupMusicControls();
         
         // Display user balance
         updateUserBalanceDisplay();
@@ -107,6 +135,31 @@ public class RaceActivity extends AppCompatActivity {
     // Keeping the method signature empty for compatibility
     private void setupSwipeDetection() {
         // Navigation is now handled by buttons instead of swipe detection
+    }
+    
+    private void setupMusicControls() {
+        // Previous track button
+        btnPreviousTrack.setOnClickListener(v -> {
+            musicManager.previousTrack();
+            showTrackChangeToast();
+        });
+        
+        // Next track button
+        btnNextTrack.setOnClickListener(v -> {
+            musicManager.nextTrack();
+            showTrackChangeToast();
+        });
+    }
+    
+    private void showTrackChangeToast() {
+        String currentTrack = musicManager.getCurrentTrackName();
+        if (currentTrack != null) {
+            Toast.makeText(
+                this, 
+                getString(R.string.track_changed, currentTrack), 
+                Toast.LENGTH_SHORT
+            ).show();
+        }
     }
     
     private void setupBetActivityLauncher() {
@@ -254,10 +307,13 @@ public class RaceActivity extends AppCompatActivity {
         totalDistance = 0;
         winnerHorse = null;
 
-        // Enable Start and Place Bet buttons
-        btnStart.setEnabled(true);
+        // Update button states
+        btnRaceAction.setText("Start Race");
+        btnRaceAction.setEnabled(true);
+        btnRaceAction.setVisibility(View.VISIBLE);
         btnPlaceBet.setEnabled(true);
-        btnPrepare.setEnabled(false);
+        btnDeposit.setEnabled(true);
+        isRacePrepared = true;
         
         // Show that all bets have been cleared for the new race
         Toast.makeText(this, "New race prepared with fresh horses. All previous bets have been discarded. Place new bets!", Toast.LENGTH_LONG).show();
@@ -265,9 +321,9 @@ public class RaceActivity extends AppCompatActivity {
 
     private void startRace() {
         raceRunning = true;
-        btnStart.setEnabled(false);
-        btnPrepare.setEnabled(false);
+        btnRaceAction.setVisibility(View.INVISIBLE);
         btnPlaceBet.setEnabled(false);
+        btnDeposit.setEnabled(false);
 
         // Đảm bảo trackWidth đã đo xong
         lane1.post(() -> {
@@ -351,7 +407,8 @@ public class RaceActivity extends AppCompatActivity {
                                     if (raceRunning) {
                                         raceRunning = false;
                                         showRaceResultDialog(horse);
-                                        btnPrepare.setEnabled(true);
+                                        isRacePrepared = false;
+                                        btnDeposit.setEnabled(true);
                                     }
                                 }
                             } else {
@@ -478,6 +535,11 @@ public class RaceActivity extends AppCompatActivity {
             dialog.dismiss();
             // Clear all previous bets
             userBets.clear();
+            // Reset race prepared state
+            isRacePrepared = false;
+            // Show and update button text
+            btnRaceAction.setVisibility(View.VISIBLE);
+            btnRaceAction.setText("Prepare Race");
             // Prepare a new race with completely new horses
             prepareRace();
             updateUserBalanceDisplay();
@@ -485,6 +547,14 @@ public class RaceActivity extends AppCompatActivity {
         });
     }
     
+    /**
+     * Opens the DepositMoneyActivity to allow the user to add funds to their balance
+     */
+    private void openDepositActivity() {
+        Intent intent = new Intent(this, DepositMoneyActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -495,5 +565,31 @@ public class RaceActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         handler.removeCallbacksAndMessages(null);
+    }
+    
+    @Override
+    protected void onDestroy() {
+        // Unbind from the music service when the activity is destroyed
+        if (musicManager != null) {
+            musicManager.unbindMusicService();
+        }
+        super.onDestroy();
+    }
+    
+    @Override
+    public void onBackPressed() {
+        // Hiển thị hộp thoại xác nhận trước khi thoát
+        new AlertDialog.Builder(this)
+            .setTitle("Thoát ứng dụng")
+            .setMessage("Bạn có muốn thoát ứng dụng không?")
+            .setPositiveButton("Có", (dialog, which) -> {
+                // Dừng dịch vụ nhạc nền khi thoát ứng dụng
+                if (musicManager != null) {
+                    musicManager.stopMusicService();
+                }
+                super.onBackPressed();
+            })
+            .setNegativeButton("Không", null)
+            .show();
     }
 }

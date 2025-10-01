@@ -1,80 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                   xmlns:app="http://schemas.android.com/apk/res-auto"
-                                   xmlns:tools="http://schemas.android.com/tools"
-                                   android:layout_width="match_parent"
-                                   android:layout_height="match_parent"
-                                   android:layout_margin="16dp"
-                                   app:cardCornerRadius="16dp"
-                                   app:cardElevation="8dp">
-    <ScrollView android:layout_width="match_parent"
-                android:layout_height="match_parent">
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:orientation="vertical"
-                      android:padding="16dp"
-                      android:gravity="center">
-            <ImageView android:id="@+id/ivHorse"
-                       android:layout_width="match_parent"
-                       android:layout_height="200dp"
-                       android:scaleType="fitCenter"
-                       android:adjustViewBounds="true"
-                       tools:src="@drawable/h1" />
-            <TextView android:id="@+id/tvHorseName"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:gravity="center"
-                      android:textSize="24sp"
-                      android:textStyle="bold"
-                      android:layout_marginTop="16dp"
-                      tools:text="Horse Name" />
-            <TextView android:id="@+id/tvOdds"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:gravity="center"
-                      android:textSize="20sp"
-                      android:layout_marginTop="8dp"
-                      tools:text="Odds: 2.5" />
-            <TextView android:id="@+id/tvExistingBet"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:gravity="center"
-                      android:textSize="18sp"
-                      android:textColor="#4CAF50"
-                      android:layout_marginTop="8dp"
-                      android:visibility="gone"
-                      tools:text="Current bet: $100" />
-            <LinearLayout android:layout_width="match_parent"
-                          android:layout_height="wrap_content"
-                          android:orientation="horizontal"
-                          android:layout_marginTop="24dp"
-                          android:gravity="center_vertical">
-                <TextView android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          android:text="Your Bet: $"
-                          android:textSize="18sp"
-                          android:textStyle="bold" />
-                <EditText android:id="@+id/etBetAmount"
-                          android:layout_width="0dp"
-                          android:layout_height="wrap_content"
-                          android:layout_weight="1"
-                          android:layout_marginStart="8dp"
-                          android:hint="Enter amount"
-                          android:inputType="number"
-                          android:textSize="18sp"
-                          android:padding="12dp"
-                          android:background="@android:drawable/edit_text" />
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="8dp">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/ivHorse"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                tools:src="@drawable/h1" />
+            <TextView
+                android:id="@+id/tvHorseName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:layout_marginTop="16dp"
+                tools:text="Horse Name" />
+            <TextView
+                android:id="@+id/tvOdds"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:layout_marginTop="8dp"
+                tools:text="Odds: 2.5" />
+            <TextView
+                android:id="@+id/tvExistingBet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:textColor="#4CAF50"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                tools:text="Current bet: $100" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Bet: $"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <EditText
+                    android:id="@+id/etBetAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:hint="Enter amount"
+                    android:inputType="number"
+                    android:textSize="18sp"
+                    android:padding="12dp"
+                    android:background="@android:drawable/edit_text" />
             </LinearLayout>
-            <TextView android:id="@+id/tvPotentialWinnings"
-                      android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:gravity="center"
-                      android:textSize="16sp"
-                      android:textColor="#2196F3"
-                      android:textStyle="italic"
-                      android:layout_marginTop="8dp"
-                      android:visibility="gone"
-                      tools:text="Potential win: $250" />
+            <TextView
+                android:id="@+id/tvPotentialWinnings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="16sp"
+                android:textColor="#2196F3"
+                android:textStyle="italic"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                tools:text="Potential win: $250" />
         </LinearLayout>
     </ScrollView>
 </androidx.cardview.widget.CardView>

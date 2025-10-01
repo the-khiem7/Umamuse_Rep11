@@ -1,5 +1,6 @@
 package com.example.umamuse;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
@@ -15,6 +17,7 @@ import com.example.umamuse.adapters.HorseBetAdapter;
 import com.example.umamuse.models.Horse;
 import com.example.umamuse.models.HorseBet;
 import com.example.umamuse.repositories.HorseRepository;
+import com.example.umamuse.utils.MusicManager;
 import com.example.umamuse.utils.UserPreferences;
 
 import java.util.ArrayList;
@@ -26,9 +29,14 @@ public class BetActivity extends AppCompatActivity {
     private ViewPager2 vpHorses;
     private Button btnConfirmBet, btnBackToRace;
     private TextView tvUserBalance;
+    private ToggleButton btnToggleSound;
+    private Button btnPreviousTrack, btnNextTrack;
     private HorseBetAdapter adapter;
     private List<HorseBet> horseBets = new ArrayList<>();
     private Random random = new Random();
+    
+    // Music manager
+    private MusicManager musicManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,9 @@ public class BetActivity extends AppCompatActivity {
         btnConfirmBet = findViewById(R.id.btnConfirmBet);
         btnBackToRace = findViewById(R.id.btnBackToRace);
         tvUserBalance = findViewById(R.id.tvUserBalance);
+        btnToggleSound = findViewById(R.id.btnToggleSound);
+        btnPreviousTrack = findViewById(R.id.btnPreviousTrack);
+        btnNextTrack = findViewById(R.id.btnNextTrack);
 
         loadHorses();
         setupViewPager();
@@ -49,6 +60,13 @@ public class BetActivity extends AppCompatActivity {
             setResult(RESULT_CANCELED);
             finish();
         });
+        
+        // Initialize music manager
+        musicManager = new MusicManager(this, btnToggleSound);
+        musicManager.bindMusicService();
+        
+        // Set up music controls
+        setupMusicControls();
     }
     
     private void updateBalanceDisplay() {
@@ -59,6 +77,31 @@ public class BetActivity extends AppCompatActivity {
     }
     
     // Navigation is now handled by buttons instead of swipe detection
+    
+    private void setupMusicControls() {
+        // Previous track button
+        btnPreviousTrack.setOnClickListener(v -> {
+            musicManager.previousTrack();
+            showTrackChangeToast();
+        });
+        
+        // Next track button
+        btnNextTrack.setOnClickListener(v -> {
+            musicManager.nextTrack();
+            showTrackChangeToast();
+        });
+    }
+    
+    private void showTrackChangeToast() {
+        String currentTrack = musicManager.getCurrentTrackName();
+        if (currentTrack != null) {
+            Toast.makeText(
+                this, 
+                getString(R.string.track_changed, currentTrack), 
+                Toast.LENGTH_SHORT
+            ).show();
+        }
+    }
 
     private void loadHorses() {
         List<Horse> raceHorses = HorseRepository.getCurrentRaceHorses();
@@ -190,8 +233,28 @@ public class BetActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // User cancelled betting, don't return any data
-        setResult(RESULT_CANCELED);
-        super.onBackPressed();
+        // Show confirmation dialog when back button is pressed
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.exit_confirmation_title)
+            .setMessage(R.string.exit_confirmation_message)
+            .setPositiveButton(R.string.yes, (dialog, which) -> {
+                // User cancelled betting, don't return any data
+                setResult(RESULT_CANCELED);
+                super.onBackPressed();
+            })
+            .setNegativeButton(R.string.no, (dialog, which) -> {
+                // If user cancels, do nothing
+                dialog.dismiss();
+            })
+            .show();
+    }
+    
+    @Override
+    protected void onDestroy() {
+        // Unbind from the music service when the activity is destroyed
+        if (musicManager != null) {
+            musicManager.unbindMusicService();
+        }
+        super.onDestroy();
     }
 }
