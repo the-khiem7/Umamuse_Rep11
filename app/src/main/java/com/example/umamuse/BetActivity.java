@@ -47,8 +47,8 @@ public class BetActivity extends AppCompatActivity {
         btnConfirmBet.setOnClickListener(v -> confirmBets());
         btnBackToRace.setOnClickListener(v -> {
             setResult(RESULT_CANCELED);
-        finish();
-});
+            finish();
+        });
     }
     
     private void updateBalanceDisplay() {
@@ -70,6 +70,9 @@ public class BetActivity extends AppCompatActivity {
             finish();
             return;
         }
+        
+        // Always ensure we have the latest race horses from the repository
+        // This is important when a new race has been prepared
         
         // Check if we have existing bets from intent extras
         boolean hasExistingBets = getIntent().getBooleanExtra("has_existing_bets", false);
@@ -180,6 +183,7 @@ public class BetActivity extends AppCompatActivity {
         // Set result and finish
         setResult(RESULT_OK, resultIntent);
         betSummary.append("\nTotal new bets: $").append(totalNewBetAmount);
+        betSummary.append("\nNOTE: Bets are only valid for the current race. All bets will be discarded when a new race is prepared.");
         Toast.makeText(this, betSummary.toString(), Toast.LENGTH_LONG).show();
         finish();
     }

@@ -97,7 +97,10 @@
     <Button android:id="@+id/btnPrepareNewRace"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Prepare New Race"
+            android:text="PREPARE NEW RACE"
+            android:textStyle="bold"
             android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"
+            android:padding="16dp"
             android:layout_marginTop="24dp" />
 </LinearLayout>

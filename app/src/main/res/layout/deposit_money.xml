@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1D79BF"
+    tools:context=".DepositMoneyActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="1dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/rounded_bg"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+
+        >
+
+            <Button
+                android:id="@+id/btnTrolai"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#7CFC00"
+                android:fontFamily="sans-serif-medium"
+                android:text="Quay lại"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <TextView
+            android:id="@+id/textView6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="HÃY LỰA CHỌN GÓI TIỀN PHÙ HỢP VỚI BẠN"
+            android:textAlignment="center"
+            android:textColor="#FFFF33"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+
+
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:weightSum="3">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="#ffffff"
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="8dp"
+                >
+
+                <TextView
+                    android:id="@+id/textView19"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🌱 Starter Pack – 100 xu"
+                    android:textAlignment="center"
+                    android:textColor="#1D3557"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    />
+
+                <TextView
+                    android:id="@+id/textView20"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Mức cược cơ bản, phù hợp cho người mới làm quen."
+                    android:textAlignment="center"
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+
+
+            </LinearLayout>
+
+            <!-- Gói Tinh Anh -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:background="#ffffff"
+
+                android:elevation="2dp"
+                android:orientation="vertical"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/textView25"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⚡ Pro Pack – 550 xu"
+                    android:textAlignment="center"
+                    android:textColor="#1D3557"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView26"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Mức cược trung bình, dành cho người chơi có kinh nghiệm hơn."
+                    android:textAlignment="center"
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="8dp"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:elevation="2dp"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/textView29"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="👑 Elite Pack – 600 xu"
+                    android:textAlignment="center"
+                    android:textColor="#1D3557"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/textView30"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Mức cược cao cấp, dành cho người chơi muốn thử thách bản thân."
+                    android:textAlignment="center"
+                    android:textColor="#333333"
+                    android:textSize="16sp" />
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+            <RadioGroup
+                    android:id="@+id/radioBtn_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/radBtn1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="110dp"
+                    android:layout_marginEnd="120dp"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <RadioButton
+                    android:id="@+id/radBtn2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginEnd="100dp"
+                    tools:ignore="TouchTargetSizeCheck" />
+
+                <RadioButton
+                    android:id="@+id/radBtn3"
+                    android:layout_width="38dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginEnd="100dp"
+                    tools:ignore="TouchTargetSizeCheck" />
+            </RadioGroup>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnClickMua"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="#FF1493"
+            android:text="Xác nhận"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -225,9 +225,10 @@ public class RaceActivity extends AppCompatActivity {
         raceHorses = new ArrayList<>(allHorses.subList(0, 4));
         HorseRepository.setCurrentRaceHorses(raceHorses);
 
-        // Reset bets for new race
+        // Reset bets for new race - completely discard all previous bets
         userBets.clear();
 
+        // Clear UI elements
         horseImages.clear();
         horseSeekBars.clear();
         lane1.removeAllViews();
@@ -259,7 +260,7 @@ public class RaceActivity extends AppCompatActivity {
         btnPrepare.setEnabled(false);
         
         // Show that all bets have been cleared for the new race
-        Toast.makeText(this, "New race prepared. Place your bets!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "New race prepared with fresh horses. All previous bets have been discarded. Place new bets!", Toast.LENGTH_LONG).show();
     }
 
     private void startRace() {
@@ -472,11 +473,15 @@ public class RaceActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
         
-        // Set button click listener
+        // Set button click listener for preparing a new race
         btnPrepareNewRace.setOnClickListener(v -> {
             dialog.dismiss();
+            // Clear all previous bets
+            userBets.clear();
+            // Prepare a new race with completely new horses
             prepareRace();
             updateUserBalanceDisplay();
+            Toast.makeText(this, "New race prepared with fresh horses! All previous bets have been discarded.", Toast.LENGTH_LONG).show();
         });
     }
     
