@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
     <application
+        android:name=".UmamuseApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -12,14 +13,35 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Umamuse">
         <activity
-            android:name=".MainActivity"
+            android:name=".MainActivity" />
+        <activity
+            android:name=".RaceActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BetActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action
+                    android:name="android.intent.action.MAIN" />
+                <category
+                    android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".OpeningActivity"
+            android:exported="false"
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <activity
+            android:name=".DepositMoneyActivity"
+            android:exported="false"
+            android:label="Nạp tiền" />
+        <!-- Background Music Service -->
+        <service
+            android:name=".services.BackgroundMusicService" />
     </application>
-
 </manifest>
