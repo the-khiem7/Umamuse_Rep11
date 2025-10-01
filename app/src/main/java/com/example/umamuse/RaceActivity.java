@@ -1,30 +1,43 @@
 package com.example.umamuse;
 
+import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.umamuse.models.Horse;
+import com.example.umamuse.models.HorseBet;
 import com.example.umamuse.repositories.HorseRepository;
+import com.example.umamuse.utils.UserPreferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class RaceActivity extends AppCompatActivity {
 
     private ImageView bgImage1, bgImage2;
     private View finishLine;
-    private Button btnPrepare, btnStart;
+    private Button btnPrepare, btnStart, btnPlaceBet;
     private FrameLayout lane1, lane2, lane3, lane4;
 
     private List<Horse> raceHorses;
@@ -45,6 +58,11 @@ public class RaceActivity extends AppCompatActivity {
     private float[] horseYOffsets;
 
     private Runnable raceRunnable;
+    private float touchX1, touchX2;
+    private static final float MIN_DISTANCE = 150;
+    private Map<Integer, HorseBet> userBets = new HashMap<>();
+    private ActivityResultLauncher<Intent> betActivityLauncher;
+    private TextView tvUserBalance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +74,8 @@ public class RaceActivity extends AppCompatActivity {
         finishLine = findViewById(R.id.finishLine);
         btnPrepare = findViewById(R.id.btnNewRace);
         btnStart = findViewById(R.id.btnStart);
+        btnPlaceBet = findViewById(R.id.btnPlaceBet);
+        tvUserBalance = findViewById(R.id.tvUserBalance);
 
         lane1 = findViewById(R.id.lane1);
         lane2 = findViewById(R.id.lane2);
@@ -71,6 +91,70 @@ public class RaceActivity extends AppCompatActivity {
 
         btnPrepare.setOnClickListener(v -> prepareRace());
         btnStart.setOnClickListener(v -> startRace());
+        btnPlaceBet.setOnClickListener(v -> openBetActivity());
+        
+        // Initially disable the bet button until horses are prepared
+        btnPlaceBet.setEnabled(false);
+        
+        // Set up activity result launcher for BetActivity
+        setupBetActivityLauncher();
+        
+        // Display user balance
+        updateUserBalanceDisplay();
+    }
+    
+    // This method is no longer needed as we're using buttons instead of swipe detection
+    // Keeping the method signature empty for compatibility
+    private void setupSwipeDetection() {
+        // Navigation is now handled by buttons instead of swipe detection
+    }
+    
+    private void setupBetActivityLauncher() {
+        betActivityLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    // Get bets data from BetActivity
+                    Bundle extras = result.getData().getExtras();
+                    if (extras != null) {
+                        userBets.clear();
+                        for (Horse horse : raceHorses) {
+                            int horseId = horse.getId();
+                            if (extras.containsKey("bet_amount_" + horseId) && extras.containsKey("bet_odds_" + horseId)) {
+                                int betAmount = extras.getInt("bet_amount_" + horseId);
+                                float odds = extras.getFloat("bet_odds_" + horseId);
+                                if (betAmount > 0) {
+                                    userBets.put(horseId, new HorseBet(horse, odds));
+                                    userBets.get(horseId).setBetAmount(betAmount);
+                                }
+                            }
+                        }
+                        updateUserBalanceDisplay();
+                    }
+                }
+            }
+        );
+    }
+
+    private void updateUserBalanceDisplay() {
+        if (tvUserBalance != null) {
+            int balance = UserPreferences.getUserBalance(this);
+            tvUserBalance.setText("Balance: $" + balance);
+        }
+    }
+    
+    private void openBetActivity() {
+        // Make sure we have horses prepared before opening the bet activity
+        if (raceHorses == null || raceHorses.isEmpty()) {
+            Toast.makeText(this, "Please prepare the race first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // Ensure race horses are set in the repository
+        HorseRepository.setCurrentRaceHorses(raceHorses);
+        
+        Intent intent = new Intent(this, BetActivity.class);
+        betActivityLauncher.launch(intent);
     }
 
     private void prepareRace() {
@@ -105,8 +189,9 @@ public class RaceActivity extends AppCompatActivity {
         totalDistance = 0;
         winnerHorse = null;
 
-        // Enable Start
+        // Enable Start and Place Bet buttons
         btnStart.setEnabled(true);
+        btnPlaceBet.setEnabled(true);
         btnPrepare.setEnabled(false);
     }
 
@@ -114,6 +199,7 @@ public class RaceActivity extends AppCompatActivity {
         raceRunning = true;
         btnStart.setEnabled(false);
         btnPrepare.setEnabled(false);
+        btnPlaceBet.setEnabled(false);
 
         // Đảm bảo trackWidth đã đo xong
         lane1.post(() -> {
@@ -196,8 +282,7 @@ public class RaceActivity extends AppCompatActivity {
                                     horse.setFinished(true);
                                     if (raceRunning) {
                                         raceRunning = false;
-                                        Toast.makeText(RaceActivity.this,
-                                                horse.getName() + " đã chiến thắng!", Toast.LENGTH_LONG).show();
+                                        showRaceResultDialog(horse);
                                         btnPrepare.setEnabled(true);
                                     }
                                 }
@@ -256,6 +341,82 @@ public class RaceActivity extends AppCompatActivity {
         sb.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,10));
         lane.addView(sb);
         horseSeekBars.add(sb);
+    }
+
+    private void showRaceResultDialog(Horse winner) {
+        // Create custom dialog using the layout
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_race_result, null);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+        
+        // Initialize dialog views
+        TextView tvWinner = dialogView.findViewById(R.id.tvWinner);
+        LinearLayout layoutBets = dialogView.findViewById(R.id.layoutBets);
+        TextView tvTotalBet = dialogView.findViewById(R.id.tvTotalBet);
+        TextView tvTotalWinnings = dialogView.findViewById(R.id.tvTotalWinnings);
+        TextView tvNewBalance = dialogView.findViewById(R.id.tvNewBalance);
+        Button btnPrepareNewRace = dialogView.findViewById(R.id.btnPrepareNewRace);
+        
+        // Set winner name
+        tvWinner.setText(winner.getName());
+        
+        // Calculate totals
+    int totalBetAmount = 0;
+    int totalWinnings = 0;
+    
+    // Add bet details to dialog
+    for (HorseBet bet : userBets.values()) {
+        Horse horse = bet.getHorse();
+        int amount = bet.getBetAmount();
+        if (amount > 0) {
+            totalBetAmount += amount;
+            
+            TextView betView = new TextView(this);
+            String betText = horse.getName() + ": $" + amount;
+            
+            // Check if this was the winning horse
+            if (horse.getId() == winner.getId()) {
+                int winnings = (int)(amount * bet.getOdds());
+                totalWinnings += winnings;
+                betText += " → $" + winnings + " (WON!)";
+                betView.setTextColor(getResources().getColor(android.R.color.holo_green_dark));
+            } else {
+                betText += " (Lost)";
+            }
+            
+            betView.setText(betText);
+            betView.setTextSize(16);
+            layoutBets.addView(betView);
+        }
+    }
+    
+    // Update user balance - DON'T deduct bet amount again, only add winnings
+    int currentBalance = UserPreferences.getUserBalance(this);
+    int newBalance = currentBalance + totalWinnings; // Bet was already deducted in BetActivity
+    UserPreferences.setUserBalance(this, newBalance);
+    
+    // Set totals in dialog
+    tvTotalBet.setText("$" + totalBetAmount);
+    tvTotalWinnings.setText("$" + totalWinnings);
+    tvNewBalance.setText("$" + newBalance);
+        
+        // Show the dialog
+        AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.show();
+        
+        // Set button click listener
+        btnPrepareNewRace.setOnClickListener(v -> {
+            dialog.dismiss();
+            prepareRace();
+            updateUserBalanceDisplay();
+        });
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateUserBalanceDisplay();
     }
 
     @Override

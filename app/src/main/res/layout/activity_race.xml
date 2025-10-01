@@ -47,6 +47,30 @@
                      android:layout_height="80dp"
                      android:layout_marginBottom="4dp" />
     </LinearLayout>
+    <!-- User Balance and Bet Button -->
+    <LinearLayout android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="top|right"
+                  android:layout_margin="16dp"
+                  android:orientation="horizontal">
+        <Button android:id="@+id/btnPlaceBet"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Place Bet"
+                android:textColor="@android:color/white"
+                android:backgroundTint="#4CAF50"
+                android:layout_marginRight="8dp"
+                android:padding="8dp" />
+        <TextView android:id="@+id/tvUserBalance"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:background="#80000000"
+                  android:padding="8dp"
+                  android:text="Balance: $1000"
+                  android:textColor="@android:color/white"
+                  android:textSize="16sp"
+                  android:textStyle="bold" />
+    </LinearLayout>
     <!-- Start button -->
     <Button android:id="@+id/btnStart"
             android:layout_width="wrap_content"

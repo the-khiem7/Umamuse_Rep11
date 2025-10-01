@@ -52,7 +52,16 @@ public class HorseRepository {
     }
 
     public static void setCurrentRaceHorses(List<Horse> horses) {
-        currentRaceHorses.clear();
+        if (horses == null) {
+            return;
+        }
+        
+        if (currentRaceHorses == null) {
+            currentRaceHorses = new ArrayList<>();
+        } else {
+            currentRaceHorses.clear();
+        }
+        
         currentRaceHorses.addAll(horses);
     }
 }
